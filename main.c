@@ -2,7 +2,7 @@
  * RestAvr.c
  *
  * Created: 06/07/2019 2:05:30 AM
- * Author : Mohamed Badra
+ * Author : Mohamed Badra and Ahmed Saad
  */ 
 
 #include <avr/io.h>
