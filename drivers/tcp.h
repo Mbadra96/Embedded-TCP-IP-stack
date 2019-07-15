@@ -3,24 +3,32 @@
  *
  * Created: 06/07/2019 4:23:45 AM
  *  Author: Mohamed Badra
- */ 
-
+ */
 
 #ifndef TCP_H_
 #define TCP_H_
 
-#include "utils.h"  //for checksum
-#include "ip.h" //for IP_DST_ADD
+#include "utils.h" //for checksum
+#include "ip.h"	//for IP_DST_ADD
 
-typedef enum TCP_STATES{CLOSED,SYN_SENT,ESTABLISHED,FIN_WAIT_1,FIN_WAIT_2,CLOSING,TIME_WAIT}tcp_state;
+typedef enum TCP_STATES
+{
+	CLOSED,
+	SYN_SENT,
+	ESTABLISHED,
+	FIN_WAIT_1,
+	FIN_WAIT_2,
+	CLOSING,
+	TIME_WAIT
+} tcp_state;
 
-typedef union SEQ{
+typedef union SEQ {
 	uint32_t num;
 	uint8_t array[4];
-}seq;
+} seq;
 
-
-typedef struct TCP{
+typedef struct TCP
+{
 	tcp_state state;
 	uint16_t src_port;
 	uint16_t dst_port;
@@ -28,21 +36,20 @@ typedef struct TCP{
 	seq seqno;
 	uint16_t ack_offset; // used to check ack offset of data
 	uint16_t hl_config;
-	uint16_t window_size;
-	uint16_t urgent_pointer;
-}tcp;
+} tcp;
 
 // defining the TCP Packet location in buffer
-#define TCP_START IP_DST_ADD+0x04
+#define TCP_LEN 20
+#define TCP_START IP_DST_ADD + 0x04
 #define TCP_SRC_PORT TCP_START
-#define TCP_DST_PORT TCP_SRC_PORT+0x02
-#define TCP_SEQ_NUM TCP_DST_PORT+0X02
-#define TCP_ACK TCP_SEQ_NUM+0x04
-#define TCP_HEAD_LEN_RESERVED_CONFIG TCP_ACK+0x04  //including bits : URG, ACK, PSH, RST, SYN, FIN
-#define TCP_WINDOW_SIZE TCP_HEAD_LEN_RESERVED_CONFIG+0x02
-#define TCP_CHECK_SUM TCP_WINDOW_SIZE+0x02
-#define TCP_UGRENT_POINTER TCP_CHECK_SUM+0x02
-#define TCP_FINISH TCP_UGRENT_POINTER+0x02
+#define TCP_DST_PORT TCP_SRC_PORT + 0x02
+#define TCP_SEQ_NUM TCP_DST_PORT + 0X02
+#define TCP_ACK TCP_SEQ_NUM + 0x04
+#define TCP_HEAD_LEN_RESERVED_CONFIG TCP_ACK + 0x04 //including bits : URG, ACK, PSH, RST, SYN, FIN
+#define TCP_WINDOW_SIZE TCP_HEAD_LEN_RESERVED_CONFIG + 0x02
+#define TCP_CHECK_SUM TCP_WINDOW_SIZE + 0x02
+#define TCP_UGRENT_POINTER TCP_CHECK_SUM + 0x02
+#define TCP_FINISH TCP_UGRENT_POINTER + 0x02
 // WE STILL HAVE NO OPTIONS :P :P
 
 // ENUM for flags
@@ -83,7 +90,7 @@ void set_tcp_src_port(uint16_t port);
 
 uint8_t check_tcp_ack(void);
 
-void add_to_tcp_seq_ack(uint32_t seq_inc,uint32_t ack_inc);
+void add_to_tcp_seq_ack(uint32_t seq_inc, uint32_t ack_inc);
 
 void set_tcp_ack_offset(uint16_t len);
 

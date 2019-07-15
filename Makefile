@@ -4,14 +4,14 @@ CC=avr-gcc
 OBJCOPY=avr-objcopy
 CFLAGS=-std=c99 -Wall -g -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -I.
 TARGET=main
-OBJFILES = arp.o dhcp.o enc28j60.o ethernet.o http.o ip.o main.o socket.o tcp.o udp.o utils.o
+OBJFILES = dhcp.o enc28j60.o ethernet.o http.o ip.o main.o socket.o tcp.o udp.o utils.o #arp.o
 LIBDIR = drivers
 
 all :build clear
 
 build:
 	$(CC) $(CFLAGS) -Os -c main.c
-	$(CC) $(CFLAGS) -Os -c $(LIBDIR)/arp.c
+	#$(CC) $(CFLAGS) -Os -c $(LIBDIR)/arp.c
 	$(CC) $(CFLAGS) -Os -c $(LIBDIR)/dhcp.c
 	$(CC) $(CFLAGS) -Os -c $(LIBDIR)/enc28j60.c
 	$(CC) $(CFLAGS) -Os -c $(LIBDIR)/ethernet.c
