@@ -18,6 +18,7 @@ typedef enum TCP_STATES
 	ESTABLISHED,
 	FIN_WAIT_1,
 	FIN_WAIT_2,
+	FIN_RECVED,
 	CLOSING,
 	TIME_WAIT
 } tcp_state;

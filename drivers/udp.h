@@ -3,7 +3,7 @@
 
 #include "utils.h" //for checksum
 #include "ip.h"	//for IP_DST_ADD
-#define UDP_LEN 8
+#define UDP_H_LEN 8
 #define UDP_START IP_DST_ADD + 0x04
 #define UDP_SRC_PORT UDP_START
 #define UDP_DST_PORT UDP_SRC_PORT + 0x02

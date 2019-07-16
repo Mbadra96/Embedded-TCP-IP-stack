@@ -82,25 +82,13 @@ uint8_t check_tcp_ack(void)
 		tcp_struct.ackno.array[3 - i] = buffer[TCP_SEQ_NUM + i];
 	}
 
-	if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_ACK_FLAG | TCP_SYN_FLAG))
-	{
-		set_tcp_state(ESTABLISHED);
-	}
-	else if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_ACK_FLAG))
+	if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_FIN_FLAG) || buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_FIN_FLAG | TCP_ACK_FLAG))
 	{
 
-		//if(get_tcp_state()==FIN_WAIT_1) set_tcp_state(FIN_WAIT_2);
-		//else if(get_tcp_state()==CLOSING) set_tcp_state(TIME_WAIT);
+		if (get_tcp_state() == ESTABLISHED)
+			set_tcp_state(FIN_RECVED);
 	}
-	else if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_ACK_FLAG | TCP_FIN_FLAG))
-	{
-		//if(get_tcp_state()==FIN_WAIT_1) set_tcp_state(TIME_WAIT);
-	}
-	else if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_FIN_FLAG))
-	{
-		//if(get_tcp_state()==FIN_WAIT_1) set_tcp_state(CLOSING);
-		//else if(get_tcp_state()==FIN_WAIT_2) set_tcp_state(TIME_WAIT);
-	}
+
 	return 1;
 }
 

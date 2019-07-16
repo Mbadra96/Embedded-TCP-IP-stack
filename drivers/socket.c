@@ -55,8 +55,8 @@ void send_udp_data(uint16_t len, uint8_t *data)
 		buffer[UDP_FINISH + i] = data[i];
 	}
 
-	set_ip_total_length(IP_LEN + UDP_LEN + len);
-	enc28j60PacketSend(len + IP_LEN + UDP_LEN + ETH_LEN, buffer);
+	set_ip_total_length(IP_LEN + UDP_H_LEN + len);
+	enc28j60PacketSend(len + IP_LEN + UDP_H_LEN + ETH_LEN, buffer);
 }
 
 uint8_t receive_data(uint8_t (*check_fnc)(void))
@@ -132,7 +132,6 @@ uint8_t socket_connect(socket sock)
 {
 
 	uint8_t dst_mac[] = {0xec, 0x55, 0xf9, 0x90, 0x12, 0xfd};
-	;
 	//get_mac_from_cache(check_return_mac(dst_ip));
 	set_src_ip(get_dhcp_src_ip());
 	set_dst_ip(sock.dst_ip);
@@ -158,6 +157,7 @@ uint8_t socket_connect(socket sock)
 	add_to_tcp_seq_ack(1, 1);
 	// send new ack to connect
 	send_tcp_data(0, 0, TCP_ACK_FLAG);
+	set_tcp_state(ESTABLISHED);
 	return 1;
 }
 
@@ -189,7 +189,7 @@ uint8_t socket_send(socket sock, uint16_t len, uint8_t *data)
 	return 0;
 }
 
-uint16_t socket_receive(uint8_t *data, socket sock)
+uint16_t socket_receive(uint8_t *data_ptr, socket sock)
 {
 	uint8_t dst_mac[] = {0xec, 0x55, 0xf9, 0x90, 0x12, 0xfd};
 	//get_mac_from_cache(check_return_mac(dst_ip));
@@ -204,10 +204,7 @@ uint16_t socket_receive(uint8_t *data, socket sock)
 
 	uint16_t data_len = get_data_length();
 
-	for (uint16_t i = 0; i < data_len; i++)
-	{
-		data[i] = buffer[TCP_FINISH + i];
-	}
+	data_ptr = &buffer[TCP_FINISH];
 
 	add_to_tcp_seq_ack(0, data_len);
 
@@ -216,9 +213,90 @@ uint16_t socket_receive(uint8_t *data, socket sock)
 	return data_len;
 }
 
-void socket_close(socket sock)
+// uint8_t socket_close(socket sock)
+// {
+// 	uint8_t dst_mac[] = {0xec, 0x55, 0xf9, 0x90, 0x12, 0xfd};
+// 	//get_mac_from_cache(check_return_mac(dst_ip));
+// 	set_src_ip(get_dhcp_src_ip());
+// 	set_dst_ip(sock.dst_ip);
+// 	set_ether_dst_mac(dst_mac);
+// 	set_tcp_src_port(sock.src_port);
+// 	set_tcp_dst_port(sock.dst_port);
+// 	set_tcp_ack_offset(1);
+
+// 	if (get_tcp_state == FIN_RECVED)
+// 	{
+// 		add_to_tcp_seq_ack(1, 1);
+// 		send_tcp_data(0, 0, TCP_ACK_FLAG);
+// 		send_tcp_data(0, 0, TCP_FIN_FLAG);
+// 		while (!receive_data(check_tcp_ack))
+// 			;
+// 		_delay_ms(256);
+// 		set_tcp_state(CLOSED);
+// 		return 1;
+// 	}
+// 	// start closing
+// 	else if (get_tcp_state() == ESTABLISHED)
+// 	{
+// 		send_tcp_data(0, 0, TCP_FIN_FLAG);
+// 		set_tcp_state(FIN_WAIT_1);
+// 		while (!receive_data(check_tcp_ack))
+// 			;
+// 	}
+
+// 	if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_ACK_FLAG))
+// 	{
+
+// 		if (get_tcp_state() == FIN_WAIT_1)
+// 		{
+// 			set_tcp_state(FIN_WAIT_2);
+// 			while (!receive_data(check_tcp_ack))
+// 				;
+// 			add_to_tcp_seq_ack(1, 0);
+// 			if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] & (TCP_FIN_FLAG))
+// 			{
+// 				send_tcp_data(0, 0, TCP_ACK_FLAG);
+// 				return 1;
+// 			}
+
+// 			return 0;
+// 		}
+// 	}
+// 	else if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_ACK_FLAG | TCP_FIN_FLAG))
+// 	{
+// 		if (get_tcp_state() == FIN_WAIT_1)
+// 		{
+// 			add_to_tcp_seq_ack(1, 0);
+// 			send_tcp_data(0, 0, TCP_ACK_FLAG);
+// 			set_tcp_state(TIME_WAIT);
+// 			_delay_us(256);
+// 			set_tcp_state(CLOSED);
+// 			return 1;
+// 		}
+// 	}
+// 	else if (buffer[TCP_HEAD_LEN_RESERVED_CONFIG + 1] == (TCP_FIN_FLAG))
+// 	{
+// 		if (get_tcp_state() == FIN_WAIT_1)
+// 		{
+// 			add_to_tcp_seq_ack(1, 0);
+// 			do
+// 			{
+// 				send_tcp_data(0, 0, TCP_ACK_FLAG);
+// 				set_tcp_state(CLOSING);
+// 				_delay_ms(128);
+// 			} while (!receive_data(check_tcp_ack));
+// 			set_tcp_state(TIME_WAIT);
+// 			_delay_ms(256);
+// 			set_tcp_state(CLOSED);
+// 			return 1;
+// 		}
+// 	}
+// }
+
+uint8_t socket_close(socket sock)
 {
 	uint8_t dst_mac[] = {0xec, 0x55, 0xf9, 0x90, 0x12, 0xfd};
+	//uint8_t src_ip[] = {192,168,1,2};
 	//get_mac_from_cache(check_return_mac(dst_ip));
 	set_src_ip(get_dhcp_src_ip());
 	set_dst_ip(sock.dst_ip);
@@ -227,9 +305,11 @@ void socket_close(socket sock)
 	set_tcp_dst_port(sock.dst_port);
 	set_tcp_ack_offset(1);
 	add_to_tcp_seq_ack(0, 1);
+	//	send_tcp_data(0,0,TCP_ACK_FLAG);
 	_delay_ms(1000);
 	if (receive_data(check_tcp_ack))
 	{
+		//add_to_tcp_seq_ack(0,1);
 		send_tcp_data(0, 0, TCP_ACK_FLAG);
 		// Send FIN and wait for ACK
 		uint8_t count = 5;
@@ -241,7 +321,7 @@ void socket_close(socket sock)
 			}
 			count++;
 			if (count > 50)
-				return;
+				return 0;
 		} while (!receive_data(check_tcp_ack));
 	}
 
@@ -257,11 +337,12 @@ void socket_close(socket sock)
 			}
 			count++;
 			if (count > 50)
-				return;
+				return 0;
 		} while (!receive_data(check_tcp_ack));
 		while (!receive_data(check_tcp_ack))
 			;
 
 		send_tcp_data(0, 0, TCP_ACK_FLAG);
 	}
+	return 1;
 }
