@@ -26,11 +26,11 @@ void init_arp_cache(void)
 
 void init_arp(uint8_t *my_mac, uint8_t *my_ip)
 {
-    arp_struct.hardware_type = 0x01; //ethernet
-    arp_struct.protocol_type = 0x0800; //for ipv4
-    arp_struct.hardware_add_len = 0x06;
-    arp_struct.protocol_add_len = 0x04;
-    arp_struct.op_code = 1; //for request 
+    //arp_struct.hardware_type = 0x01; //ethernet
+    //arp_struct.protocol_type = 0x0800; //for ipv4
+    //arp_struct.hardware_add_len = 0x06;
+    //arp_struct.protocol_add_len = 0x04;
+    //arp_struct.op_code = 1; //for request 
     for (uint8_t i=0;i<6;i++)
     {
         arp_struct.sender_mac[i] = my_mac[i];
@@ -51,12 +51,12 @@ void init_request_arp_in_buffer(uint8_t *dest_ip)
     }
     set_ether_struct_arp_request();
     init_ether_in_buffer();
-    buffer[ARP_HARDWARE_TYPE] = (uint8_t) (arp_struct.hardware_type>>8);
-    buffer[ARP_HARDWARE_TYPE+1] = (uint8_t) (arp_struct.hardware_type);
-    buffer[ARP_PROTOCOL_TYPE] = (uint8_t) (arp_struct.protocol_type>>8);
-    buffer[ARP_PROTOCOL_TYPE+1] = (uint8_t) (arp_struct.protocol_type);
-    buffer[ARP_OP_CODE] = (uint8_t) (arp_struct.op_code>>8);
-    buffer[ARP_OP_CODE+1] = (uint8_t) (arp_struct.op_code);
+    buffer[ARP_HARDWARE_TYPE] = (uint8_t) (0x01>>8);
+    buffer[ARP_HARDWARE_TYPE+1] = (uint8_t) (0x01);
+    buffer[ARP_PROTOCOL_TYPE] = (uint8_t) (0x0800>>8);
+    buffer[ARP_PROTOCOL_TYPE+1] = (uint8_t) (0x0800);
+    buffer[ARP_OP_CODE] = (uint8_t) (0x01>>8);
+    buffer[ARP_OP_CODE+1] = (uint8_t) (0x01);
     for (uint8_t i=0; i<6;i++)
     {
         buffer[ARP_SENDER_MAC_ADD+i] = arp_struct.sender_mac[i];
