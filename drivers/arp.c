@@ -50,13 +50,15 @@ void init_request_arp_in_buffer(uint8_t *dest_ip)
         arp_struct.dest_ip[i]=dest_ip[i];   
     }
     set_ether_struct_arp_request();
-    init_ether_in_buffer();
-    buffer[ARP_HARDWARE_TYPE] = (uint8_t) (0x01>>8);
-    buffer[ARP_HARDWARE_TYPE+1] = (uint8_t) (0x01);
-    buffer[ARP_PROTOCOL_TYPE] = (uint8_t) (0x0800>>8);
-    buffer[ARP_PROTOCOL_TYPE+1] = (uint8_t) (0x0800);
-    buffer[ARP_OP_CODE] = (uint8_t) (0x01>>8);
-    buffer[ARP_OP_CODE+1] = (uint8_t) (0x01);
+    init_ether_in_buffer(); ////ether type needs to be changebale not set in there
+    buffer[ARP_HARDWARE_TYPE] = (0x01>>8);
+    buffer[ARP_HARDWARE_TYPE+1] = (0x01);
+    buffer[ARP_PROTOCOL_TYPE] = (0x0800>>8);
+    buffer[ARP_PROTOCOL_TYPE+1] = (0x0800);
+    buffer[ARP_OP_CODE] = (0x01>>8);
+    buffer[ARP_OP_CODE+1] = (0x01);
+	buffer[ARP_HARDWARE_ADD_LEN] = 0x06;
+	buffer[ARP_PROTOCOL_ADD_LEN] = 0x04;
     for (uint8_t i=0; i<6;i++)
     {
         buffer[ARP_SENDER_MAC_ADD+i] = arp_struct.sender_mac[i];
