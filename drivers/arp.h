@@ -22,11 +22,11 @@
 
 typedef struct ARP{
 
-    uint16_t hardware_type;
-    uint16_t protocol_type;
-    uint8_t hardware_add_len;
-    uint8_t protocol_add_len;
-    uint16_t op_code;
+   // uint16_t hardware_type;
+    //uint16_t protocol_type;
+    //uint8_t hardware_add_len;
+    //uint8_t protocol_add_len;
+    //uint16_t op_code;
     uint8_t sender_mac[6];
     uint8_t sender_ip[4];
     uint8_t dest_mac[6];
